@@ -33,15 +33,4 @@ class TestRedisRetry < Test::Unit::TestCase
     assert_raise(Errno::ECONNREFUSED) { @redis['foo'] }
   end
 
-  def test_should_reset_tries_for_every_call
-    # Mocha doesn't seem to like the two #raises with the #returns between
-    # unless they are distinguished by expecting different input params
-    send = sequence('send')
-    @r.stubs(:send).with(:[], 'foo').raises(Errno::ECONNREFUSED).times(8).in_sequence(send)
-    @r.stubs(:send).with(:[], 'foo').returns(true).in_sequence(send)
-    @r.stubs(:send).with(:[], 'bar').raises(Errno::ECONNREFUSED).times(8).in_sequence(send)
-    @r.stubs(:send).with(:[], 'bar').returns(true).in_sequence(send)
-    assert @redis['foo']
-    assert @redis['bar']
-  end
 end
